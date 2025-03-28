@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "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"
+                    "Authorization": ""
                 },
                 body: JSON.stringify({
                     model: "gpt-4o-mini",
