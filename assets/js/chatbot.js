@@ -2,14 +2,14 @@
 document.addEventListener("DOMContentLoaded", function () {
     const chatbotHTML = `
         <div id="chatbot">
-            <div id="chat-header">AI Chatbot <span id="close-chat">&times;</span></div>
+            <div id="chat-header">Chatbot <span id="close-chat">&times;</span></div>
             <div id="chat-body"></div>
             <div id="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Type a message..." />
                 <button id="send-btn">Send</button>
             </div>
         </div>
-        <button id="chat-toggle">💬 Chat</button>
+        <button id="chat-toggle">Chat Now</button>
     `;
     
     document.body.insertAdjacentHTML("beforeend", chatbotHTML);
@@ -20,11 +20,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendBtn = document.getElementById("send-btn");
     const chatInput = document.getElementById("chat-input");
     const chatBody = document.getElementById("chat-body");
+    
+    let hasWelcomed = false;
 
     // Toggle chatbot visibility
     chatToggle.addEventListener("click", () => {
         chatbot.style.display = "block";
         chatToggle.style.display = "none";
+        
+        // Add welcome message on first open
+        if (!hasWelcomed) {
+            addMessage("Chatbot", "Hi! How can I help you know more about Utkarsh?");
+            hasWelcomed = true;
+        }
     });
 
     closeChat.addEventListener("click", () => {
@@ -55,9 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json();
             const botMessage = data.choices[0]?.message?.content || "Sorry, I couldn't understand that.";
-            addMessage("AI", botMessage);
+            addMessage("Chatbot", botMessage);
         } catch (error) {
-            addMessage("AI", "Error: Unable to fetch response. Please check your API key.");
+            addMessage("Chatbot", "Error: Unable to fetch response. Please check your API key.");
         }
     }
 

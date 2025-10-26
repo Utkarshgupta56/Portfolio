@@ -164,13 +164,26 @@ h6 {
   }
 }
 
-@media (min-width: 1200px) and (max-width: 1600px) {
+@media (min-width: 1200px) {
   .header~main {
     margin-left: 160px;
+    margin-right: 60px;
   }
 
   .header~main .hero {
     margin-left: -160px;
+    width: 100vw;
+  }
+}
+
+@media (min-width: 1600px) {
+  .header~main {
+    margin-left: 200px;
+    margin-right: 100px;
+  }
+
+  .header~main .hero {
+    margin-left: -200px;
     width: 100vw;
   }
 }
@@ -465,6 +478,7 @@ section,
   overflow: clip;
 }
 
+
 /*--------------------------------------------------------------
 # Global Section Titles
 --------------------------------------------------------------*/
@@ -663,38 +677,70 @@ section,
 /*--------------------------------------------------------------
 # Skills Section
 --------------------------------------------------------------*/
-.skills .progress {
-  height: 60px;
-  display: block;
-  background: none;
-  border-radius: 0;
+.skills-grid {
+  margin-top: 20px;
 }
 
-.skills .progress .skill {
+.skill-icon-item {
+  margin-bottom: 30px;
+}
+
+.skill-box {
+  background: var(--surface-color);
+  box-shadow: 0px 5px 90px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.skill-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0px 15px 90px 0px rgba(0, 0, 0, 0.15);
+}
+
+.skill-box img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 15px;
+  transition: all 0.3s ease-in-out;
+}
+
+.skill-box:hover img {
+  transform: scale(1.1);
+}
+
+.skill-box h4 {
   color: var(--heading-color);
-  padding: 0;
-  margin: 0 0 6px 0;
-  text-transform: uppercase;
-  display: block;
+  font-size: 18px;
   font-weight: 600;
-  font-family: var(--heading-font);
+  margin: 0;
+  transition: color 0.3s;
 }
 
-.skills .progress .skill .val {
-  float: right;
-  font-style: normal;
+.skill-box:hover h4 {
+  color: var(--accent-color);
 }
 
-.skills .progress-bar-wrap {
-  background: color-mix(in srgb, var(--default-color), transparent 90%);
-  height: 10px;
-}
-
-.skills .progress-bar {
-  width: 1px;
-  height: 10px;
-  transition: 0.9s;
-  background-color: var(--accent-color);
+@media (max-width: 768px) {
+  .skill-box {
+    padding: 20px;
+  }
+  
+  .skill-box img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .skill-box h4 {
+    font-size: 16px;
+  }
 }
 
 /*--------------------------------------------------------------
@@ -1070,6 +1116,16 @@ section,
 /*--------------------------------------------------------------
 # Contact Section
 --------------------------------------------------------------*/
+.contact .contact-content {
+  gap: 40px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contact .info-item {
+  width: 100%;
+}
+
 .contact .info-item+.info-item {
   margin-top: 40px;
 }
@@ -1085,7 +1141,7 @@ section,
   align-items: center;
   border-radius: 50px;
   transition: all 0.3s ease-in-out;
-  margin-right: 15px;
+  margin-bottom: 15px;
 }
 
 .contact .info-item h3 {
@@ -1458,24 +1514,26 @@ section,
 /* Chatbot Styles */
 #chatbot {
   position: fixed;
-  bottom: 80px;
-  right: 20px;
-  width: 300px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  bottom: 83px;
+  right: 15px;
+  width: 320px;
+  background: var(--surface-color);
+  border-radius: 12px;
+  box-shadow: 0px 5px 90px 0px rgba(0, 0, 0, 0.15);
   display: none;
   flex-direction: column;
-  font-family: Arial, sans-serif;
+  font-family: var(--default-font);
   z-index: 1000;
+  overflow: hidden;
 }
 
 #chat-header {
-  background: #007bff;
-  color: white;
-  padding: 10px;
+  background: var(--accent-color);
+  color: var(--contrast-color);
+  padding: 12px;
   text-align: center;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 16px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   position: relative;
@@ -1483,48 +1541,135 @@ section,
 
 #close-chat {
   position: absolute;
-  right: 10px;
+  right: 12px;
   cursor: pointer;
+  font-size: 24px;
+  transition: all 0.3s ease;
+  line-height: 1;
+}
+
+#close-chat:hover {
+  transform: scale(1.2);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 #chat-body {
   height: 250px;
   overflow-y: auto;
-  padding: 10px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  padding: 10px 12px;
+  border-radius: 8px;
+  max-width: 85%;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.user-message {
+  background: var(--accent-color);
+  color: var(--contrast-color);
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-message {
+  background: color-mix(in srgb, var(--default-color), transparent 95%);
+  color: var(--default-color);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.message strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  opacity: 0.8;
 }
 
 #chat-input-container {
   display: flex;
-  border-top: 1px solid #ddd;
-  padding: 5px;
+  border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  padding: 8px;
+  gap: 8px;
 }
 
 #chat-input {
   flex: 1;
-  padding: 5px;
-  border: none;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+  border-radius: 6px;
   outline: none;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+#chat-input:focus {
+  border-color: var(--accent-color);
 }
 
 #send-btn {
-  background: #007bff;
-  color: white;
+  background: var(--accent-color);
+  color: var(--contrast-color);
   border: none;
-  padding: 5px 10px;
+  padding: 8px 16px;
   cursor: pointer;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#send-btn:hover {
+  background: color-mix(in srgb, var(--accent-color), transparent 15%);
 }
 
 #chat-toggle {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #007bff;
-  color: white;
+  bottom: 83px;
+  right: 15px;
+  background: var(--accent-color);
+  color: var(--contrast-color);
   border: none;
-  padding: 10px 15px;
-  border-radius: 50%;
+  padding: 12px 20px;
+  border-radius: 50px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 5px 30px rgba(5, 99, 187, 0.4);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+#chat-toggle:hover {
+  background: color-mix(in srgb, var(--accent-color), transparent 15%);
+  transform: translateY(-3px);
+  box-shadow: 0px 8px 35px rgba(5, 99, 187, 0.5);
+}
+
+#chat-toggle:active {
+  transform: translateY(-1px);
+  box-shadow: 0px 4px 20px rgba(5, 99, 187, 0.4);
+}
+
+@media (max-width: 768px) {
+  #chat-toggle {
+    bottom: 80px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  #chatbot {
+    bottom: 80px;
+    width: calc(100% - 40px);
+    max-width: 300px;
+  }
 }
