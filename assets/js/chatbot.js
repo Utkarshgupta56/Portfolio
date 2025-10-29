@@ -49,23 +49,19 @@ document.addEventListener("DOMContentLoaded", function () {
         chatInput.value = "";
 
         try {
-            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": ""
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    model: "gpt-4o-mini",
-                    messages: [{ role: "user", content: userMessage }]
-                })
+                body: JSON.stringify({ message: userMessage })
             });
 
             const data = await response.json();
-            const botMessage = data.choices[0]?.message?.content || "Sorry, I couldn't understand that.";
+            const botMessage = data.reply || "Sorry, I couldn't understand that.";
             addMessage("Chatbot", botMessage);
         } catch (error) {
-            addMessage("Chatbot", "Error: Unable to fetch response. Please check your API key.");
+            addMessage("Chatbot", "Error: Unable to reach the chat service. Try again later.");
         }
     }
 
