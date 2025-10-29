@@ -1117,7 +1117,7 @@ section,
 # Contact Section
 --------------------------------------------------------------*/
 .contact .contact-content {
-  gap: 40px;
+  gap: 16px;
   max-width: 600px;
   margin: 0 auto;
 }
@@ -1127,7 +1127,7 @@ section,
 }
 
 .contact .info-item+.info-item {
-  margin-top: 40px;
+  margin-top: 16px;
 }
 
 .contact .info-item i {
