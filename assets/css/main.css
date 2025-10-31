@@ -802,6 +802,34 @@ section,
   border: 2px solid var(--accent-color);
 }
 
+.resume-card {
+  background: var(--surface-color);
+  box-shadow: 0px 5px 50px 0px rgba(5, 99, 187, 0.10); /* accent color touch */
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin: 32px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.resume-card:hover {
+  transform: translateY(-9px) scale(1.018);
+  box-shadow: 0px 12px 60px 0px rgba(5, 99, 187, 0.18);
+}
+
+.resume-card:first-child {
+  margin-top: 0;
+}
+
+.resume-card .resume-title {
+  font-size: 23px;
+  margin-bottom: 18px;
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
 /*--------------------------------------------------------------
 # Portfolio Section
 --------------------------------------------------------------*/
@@ -1672,4 +1700,170 @@ section,
     width: calc(100% - 40px);
     max-width: 300px;
   }
+}
+
+.experience-card {
+  position: relative;
+  border-left: 7px solid var(--accent-color);
+  padding-left: 2.4rem;
+  overflow: visible;
+  margin-top: 48px;
+}
+.experience-card .card-icon {
+  position: absolute;
+  left: -34px;
+  top: 22px;
+  background: var(--surface-color);
+  border-radius: 50%;
+  box-shadow: 0 1px 6px 0 rgba(5,99,187,0.08);
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.experience-card .resume-title {
+  margin-bottom: 12px;
+  color: var(--accent-color);
+  letter-spacing: 0.03em;
+}
+.exp-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em 1em;
+  align-items: baseline;
+  font-size: 1.13rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.exp-role {
+  color: var(--heading-color);
+  font-weight: 700;
+}
+.exp-at {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+.exp-when {
+  color: #64748b;
+  font-size: 1em;
+  font-weight: 400;
+  background: color-mix(in srgb, var(--accent-color) 14%, transparent 89%);
+  padding: 2px 11px;
+  border-radius: 6px;
+}
+.exp-details {
+  margin-bottom: 6px;
+}
+.exp-desc {
+  font-style: italic;
+  color: #555e6c;
+  margin-bottom: 12px;
+}
+.exp-timeline {
+  margin-left: 0.7em;
+  border-left: 2px solid var(--accent-color);
+  padding-left: 1.13em;
+  padding-bottom: 0.9em;
+  position: relative;
+}
+.exp-timeline-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 4px;
+  position: relative;
+}
+.exp-timeline-dot {
+  width: 13px;
+  height: 13px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  position: absolute;
+  left: -1.35em;
+  top: 5px;
+  box-shadow: 0px 0px 0px 2px #f0f7ff;
+}
+.exp-timeline-content {
+  padding-bottom: 2px;
+  flex: 1;
+}
+.exp-label {
+  font-size: 1.07rem;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+.exp-ul {
+  margin-left: 0.3em;
+  margin-bottom: 0;
+  padding-left: 22px;
+  list-style: none;
+}
+.exp-ul li {
+  background: color-mix(in srgb, var(--accent-color),white 90%);
+  border-left: 3px solid var(--accent-color);
+  border-radius: 7px;
+  margin: 8px 0 0 0;
+  padding: 8px 15px 8px 13px;
+  font-size: 1rem;
+  color: #22304b;
+  box-shadow: 0 1px 6px 0 rgba(5,99,187,0.07);
+  transition: background 0.2s;
+}
+.exp-ul li:first-child { margin-top: 2px;}
+.exp-ul li:hover {
+  background: color-mix(in srgb, var(--accent-color),white 86%);
+}
+.exp-highlight {
+  border-left: 4px solid var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 11%, white 92%);
+  font-weight: 600;
+  color: #15345c;
+  margin-top: 12px !important;
+  margin-bottom: 4px !important;
+  padding: 14px 18px 14px 15px;
+  border-radius: 10px;
+  box-shadow: 0 1px 10px 0 rgba(5,99,187,0.13);
+  position: relative;
+  display: block;
+}
+.exp-lab-link {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 17px;
+  padding: 7px 17px 7px 12px;
+  background: color-mix(in srgb, var(--accent-color) 13%, white 90%);
+  color: var(--accent-color);
+  border-radius: 50px;
+  font-size: 1em;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 1.5px 4px rgba(5,99,187,0.07);
+  transition: background 0.16s, color 0.16s;
+}
+.exp-lab-link:hover {
+  background: color-mix(in srgb, var(--accent-color) 30%, white 70%);
+  color: #fff;
+}
+.exp-lab-link i { margin-right: 0.34em; font-size: 1.09em; vertical-align: baseline; }
+.exp-certificate {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 7px 14px 7px 10px;
+  background: var(--accent-color);
+  color: var(--contrast-color) !important;
+  border-radius: 40px;
+  font-size: 0.98em;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2.5px 12px rgba(5,99,187,0.13);
+  transition: background 0.17s, color 0.17s;
+}
+.exp-certificate i { margin-right: 0.29em; font-size: 1.06em; vertical-align: baseline; }
+.exp-certificate:hover {
+  background: color-mix(in srgb, var(--accent-color), transparent 12%);
+  color: #fff !important;
+}
+@media (max-width: 600px) {
+  .experience-card { padding-left: 1.13rem; }
+  .exp-timeline { padding-left: 0.7em; }
+  .exp-ul li { font-size: 0.98rem; padding: 7px 12px; }
 }
