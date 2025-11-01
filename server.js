@@ -125,7 +125,7 @@ Board (2021-22)
 `;
 
 app.post('/api/chat', async (req, res) => {
-  const { message, history, websiteData } = req.body || {};
+  const { message, history, websiteData, context } = req.body || {};
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Missing message' });
   }
@@ -138,9 +138,11 @@ app.post('/api/chat', async (req, res) => {
   try {
     let systemMessage = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
     
-    if (websiteData) {
-      // Build comprehensive system message from websiteData
-      systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. You have access to all information about Utkarsh from his portfolio.
+    if (websiteData || context) {
+      // Prioritize websiteData object if available, fallback to context string
+      if (websiteData) {
+        // Build comprehensive system message from websiteData
+        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. You have access to all information about Utkarsh from his portfolio. ONLY use the information provided below. Do not add external knowledge, hallucinate details, or reference anything not explicitly stated here. If a question is unrelated to Utkarsh or the portfolio, politely redirect to portfolio topics.
 
 PERSONAL INFORMATION:
 Name: ${websiteData.personalInfo.name || 'Utkarsh Gupta'}
@@ -181,7 +183,15 @@ ${Object.entries(websiteData.contact || {}).map(([key, value]) => `${key.charAt(
 FULL RESUME CONTENT:
 ${fullResumeContent}
 
-Your role is to answer questions about Utkarsh's background, experience, projects, skills, and provide helpful information to visitors. Be professional, concise, and helpful.`;
+Your role is to answer questions about Utkarsh's background, experience, projects, skills, and provide helpful information to visitors. Be professional, concise, and helpful. Always base responses on the provided data.`;
+      } else if (context) {
+        // Fallback: Use the context string directly as system prompt (if websiteData missing)
+        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. ONLY use the information provided below. Do not add external knowledge, hallucinate details, or reference anything not explicitly stated here. If a question is unrelated to Utkarsh or the portfolio, politely redirect to portfolio topics.
+
+${context}
+
+Your role is to answer questions about Utkarsh's background, experience, projects, skills, and provide helpful information to visitors. Be professional, concise, and helpful. Always base responses on the provided data.`;
+      }
     }
 
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -197,7 +207,8 @@ Your role is to answer questions about Utkarsh's background, experience, project
           ...(Array.isArray(history) ? history : []),
           { role: 'user', content: message }
         ],
-        temperature: 0.3
+        temperature: 0.1,  // Lowered for more deterministic, less hallucinated responses
+        max_tokens: 300    // Limit to keep responses concise
       })
     });
 
