@@ -21,9 +21,8 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Full resume content as static string (extracted from Resume.pdf)
-const fullResumeContent = `
-Utkarsh Gupta
+// Full resume content as static string (updated from latest Resume.pdf)
+const fullResumeContent = `Utkarsh Gupta
 +91 9529133103 itsutkarsh1207@gmail.com
 LinkedIn
 GitHub
@@ -121,8 +120,7 @@ General Secretary Academic Affairs (2025-26) and Junior General Secretary Academ
 Assistant Student Mentor Coordinator, Student Mentorship Program(SMP), IIT Dharwad
 Public Relations Coordinator, Carrer Development Cell (CDC), IIT Dharwad
 Class XII Achievement: INSPIRE Scholarship awardee (Top 1%) for securing top percentile in Maharashtra
-Board (2021-22)
-`;
+Board (2021-22)`;
 
 app.post('/api/chat', async (req, res) => {
   const { message, history, websiteData, context } = req.body || {};
@@ -142,18 +140,20 @@ app.post('/api/chat', async (req, res) => {
   console.log('context length:', context ? context.length : 0);
 
   try {
-    let systemMessage = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
-    
+    // ALWAYS build and use full context first—ensure it's sent before user message
+    let fullContext = '';
     if (websiteData || context) {
       // Force context usage: Validate and build prompt
       const hasValidData = websiteData && (websiteData.personalInfo || websiteData.projects || websiteData.workExperience);
       if (hasValidData) {
-        systemMessage = `You are Utkarsh Gupta's portfolio AI assistant. STEP 1: Scan the EXACT data below (including FULL RESUME CONTENT) for facts. STEP 2: Answer ONLY using those facts—NEVER say "I don't know" or invent details. If no match, quote the closest section. STEP 3: Keep under 100 words; use bullets for lists. STEP 4: For off-topic, redirect: "Let's talk Utkarsh's portfolio—education, projects, or experience?"
+        fullContext = `You are Utkarsh Gupta's portfolio AI assistant. STEP 1: Scan the EXACT data below (including FULL RESUME CONTENT) for facts. STEP 2: Answer ONLY using those facts—NEVER say "I don't know," "couldn't understand," or invent details. If no match, quote the closest section or redirect. STEP 3: Keep under 100 words; use bullets for lists. STEP 4: For off-topic, redirect: "Let's talk Utkarsh's portfolio—education, projects, or experience?"
 
-EXAMPLE:
-User: "What does he study?" → "B.Tech in Computer Science and Engineering at IIT Dharwad (CPI: 9.17)."
-User: "Projects?" → Bullet list from PROJECTS section.
-User: "Random fact?" → "Sticking to portfolio: Ask about his AI Intern role!"
+EXAMPLE (FOLLOW STRICTLY):
+User: "Who is Utkarsh?" → "Utkarsh Gupta is a Final Year B.Tech student in Computer Science and Engineering at IIT Dharwad (CPI: 9.17)."
+User: "What is the website about?" → "This is Utkarsh Gupta's professional portfolio showcasing his education, work experience, projects, publications, skills, and achievements."
+User: "What does he study?" → "B.Tech in Computer Science and Engineering at Indian Institute of Technology Dharwad (CPI: 9.17)."
+User: "Projects?" → "- AI Playwright: Custom tokenizer and lightweight GPT model using PyTorch.\n- College Tech Fest Website: 3D interactive site with React Three Fiber.\n- DDoS Detection in SDN: ML-based system with 98.6% accuracy."
+User: "Today's time?" → "I'm focused on Utkarsh's portfolio—ask about his AI Intern role!"
 
 PERSONAL INFORMATION:
 Name: ${websiteData.personalInfo?.name || 'Utkarsh Gupta'}
@@ -176,27 +176,33 @@ SKILLS: ${(websiteData.skills || []).join(', ') || 'See FULL RESUME CONTENT'}
 
 CONTACT: ${Object.entries(websiteData.contact || {}).map(([k, v]) => `${k}: ${v}`).join('\n') || 'See FULL RESUME CONTENT'}
 
-FULL RESUME CONTENT (MANDATORY REFERENCE FOR ALL QUERIES):
+FULL RESUME CONTENT (MANDATORY REFERENCE FOR ALL QUERIES—READ THIS FIRST):
 ${fullResumeContent}`;
       } else if (context) {
         // Fallback to context string
-        systemMessage = `You are Utkarsh Gupta's portfolio AI assistant. STEP 1: Scan the EXACT data below (including FULL RESUME CONTENT) for facts. STEP 2: Answer ONLY using those facts—NEVER say "I don't know" or invent details. If no match, quote the closest section. STEP 3: Keep under 100 words; use bullets for lists. STEP 4: For off-topic, redirect: "Let's talk Utkarsh's portfolio—education, projects, or experience?"
+        fullContext = `You are Utkarsh Gupta's portfolio AI assistant. STEP 1: Scan the EXACT data below (including FULL RESUME CONTENT) for facts. STEP 2: Answer ONLY using those facts—NEVER say "I don't know," "couldn't understand," or invent details. If no match, quote the closest section or redirect. STEP 3: Keep under 100 words; use bullets for lists. STEP 4: For off-topic, redirect: "Let's talk Utkarsh's portfolio—education, projects, or experience?"
 
-EXAMPLE:
-User: "What does he study?" → "B.Tech in Computer Science and Engineering at IIT Dharwad (CPI: 9.17)."
-User: "Projects?" → Bullet list from PROJECTS section.
+EXAMPLE (FOLLOW STRICTLY):
+User: "Who is Utkarsh?" → "Utkarsh Gupta is a Final Year B.Tech student in Computer Science and Engineering at IIT Dharwad (CPI: 9.17)."
+User: "What is the website about?" → "This is Utkarsh Gupta's professional portfolio showcasing his education, work experience, projects, publications, skills, and achievements."
+User: "What does he study?" → "B.Tech in Computer Science and Engineering at Indian Institute of Technology Dharwad (CPI: 9.17)."
+User: "Projects?" → "- AI Playwright: Custom tokenizer and lightweight GPT model using PyTorch.\n- College Tech Fest Website: 3D interactive site with React Three Fiber.\n- DDoS Detection in SDN: ML-based system with 98.6% accuracy."
+User: "Today's time?" → "I'm focused on Utkarsh's portfolio—ask about his AI Intern role!"
 
 ${context}
 
-FULL RESUME CONTENT (MANDATORY REFERENCE FOR ALL QUERIES):
+FULL RESUME CONTENT (MANDATORY REFERENCE FOR ALL QUERIES—READ THIS FIRST):
 ${fullResumeContent}`;
       } else {
         console.warn('No valid context—using fallback prompt');
+        fullContext = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
       }
     } else {
       console.error('No context provided—responses will be generic');
+      fullContext = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
     }
 
+    // Now send the full context as system prompt, followed by user message
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -204,15 +210,15 @@ ${fullResumeContent}`;
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',  // Efficient and capable; use 'gpt-4o' for even better quality
+        model: 'gpt-4o-mini',  // Efficient and capable; upgrade to 'gpt-4o' if needed for complex queries
         messages: [
-          { role: 'system', content: systemMessage },
+          { role: 'system', content: fullContext },  // Full context ALWAYS first
           ...(Array.isArray(history) ? history : []),
-          { role: 'user', content: message }
+          { role: 'user', content: message }  // User query after context
         ],
-        temperature: 0.0,  // Factual only—no creativity
+        temperature: 0.0,  // Factual only—no creativity or "sorry" evasions
         max_tokens: 150,   // Super concise
-        top_p: 0.8         // Tight focus
+        top_p: 0.8         // Tight focus on provided data
       })
     });
 
@@ -221,7 +227,7 @@ ${fullResumeContent}`;
       return res.status(openaiResponse.status).json({ error: data.error || 'OpenAI API error' });
     }
 
-    const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
+    const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong—try rephrasing.';
     console.log('Generated reply:', reply);  // Log for debugging
     return res.json({ reply });
   } catch (err) {
