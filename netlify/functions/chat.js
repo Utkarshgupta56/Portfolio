@@ -9,7 +9,7 @@ const fullResumeContent = `Utkarsh Gupta
 +91 9529133103 itsutkarsh1207@gmail.com
 LinkedIn GitHub
 Education
-Indian Institute of Technology Dharwad 2022 – Current
+Indian Institute of Technology Dharwad 2022 - Current
 B.Tech, Computer Science And Engineering CPI: 9.17
 Work Experience
 AI Intern Jun 2025 - Present Dvara-E-Registry
@@ -20,7 +20,7 @@ Summer Research and Development Internship May 2024 - Jul 2024 FutureGNetworks L
 • Integrated open-source power monitoring and system profiling tools (KEPLER, Prometheus, Grafana) into containerized 5G RAN deployments to enable real-time telemetry of CPU, cache, memory bandwidth, and energy metrics.
 • Built automated workload generation and dynamic resource allocation workflows using iperf3, evaluating throughput, CPU utilization, LLC cache allocation, and memory bandwidth across deployment models (Monolithic RAN, Disaggregated RAN, C/U-plane separation).
 Publications
-Research Paper - IEEE ANTS 2024 Dec 14, 2024 – Dec 18, 2024 IEEE ComSoc | 5G vRAN, Energy Profiling, Kubernetes, Prometheus, Grafana IIT Guwahati, India
+Research Paper - IEEE ANTS 2024 Dec 14, 2024 - Dec 18, 2024 IEEE ComSoc | 5G vRAN, Energy Profiling, Kubernetes, Prometheus, Grafana IIT Guwahati, India
 • Analyzed Radio Access Network (RAN) components of cellular networks focusing on CPU utilization, LLC (Last-Level Cache) ways allocation, and memory bandwidth efficiency.
 • Co-authored and published research paper in the IEEE ANTS Conference 2024.
 Projects

@@ -1,7 +1,7 @@
 [build]
-  publish = "."  # Serve static files from root
-  functions = "netlify/functions"  # Backend folder
+  publish = "."
+  functions = "netlify/functions"
 [[redirects]]
-  from = "/api/*"  # Route API calls to functions
+  from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
