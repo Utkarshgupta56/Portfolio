@@ -135,6 +135,10 @@ app.post('/api/chat', async (req, res) => {
     return res.status(500).json({ error: 'Server is missing GROQ_API_KEY' });
   }
 
+  // Debug logging (remove in production)
+  console.log('Received websiteData:', !!websiteData ? 'Yes' : 'No');
+  console.log('Received context length:', context ? context.length : 0);
+
   try {
     let systemMessage = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
     
@@ -142,7 +146,7 @@ app.post('/api/chat', async (req, res) => {
       // Prioritize websiteData object if available, fallback to context string
       if (websiteData) {
         // Build comprehensive system message from websiteData
-        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. You have access to all information about Utkarsh from his portfolio. ONLY use the information provided below. Do not add external knowledge, hallucinate details, or reference anything not explicitly stated here. If a question is unrelated to Utkarsh or the portfolio, politely redirect to portfolio topics.
+        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. CRITICALLY: ALWAYS base EVERY response on the EXACT information below. Do not say "I don't have information" or evade—use the data provided. If unclear, reference the FULL RESUME CONTENT section. For off-topic queries, politely say: "I'm focused on Utkarsh's portfolio—ask about his education, projects, or experience!"
 
 PERSONAL INFORMATION:
 Name: ${websiteData.personalInfo.name || 'Utkarsh Gupta'}
@@ -180,17 +184,20 @@ ${(websiteData.skills || []).join(', ')}
 CONTACT INFORMATION:
 ${Object.entries(websiteData.contact || {}).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n')}
 
-FULL RESUME CONTENT:
+FULL RESUME CONTENT (USE THIS FOR ALL DETAILS):
 ${fullResumeContent}
 
-Your role is to answer questions about Utkarsh's background, experience, projects, skills, and provide helpful information to visitors. Be professional, concise, and helpful. Always base responses on the provided data.`;
+Be professional, concise (under 150 words), and helpful. Structure answers with bullets if listing (e.g., projects).`;
       } else if (context) {
         // Fallback: Use the context string directly as system prompt (if websiteData missing)
-        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. ONLY use the information provided below. Do not add external knowledge, hallucinate details, or reference anything not explicitly stated here. If a question is unrelated to Utkarsh or the portfolio, politely redirect to portfolio topics.
+        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. CRITICALLY: ALWAYS base EVERY response on the EXACT information below. Do not say "I don't have information" or evade—use the data provided. If unclear, reference the FULL RESUME CONTENT section. For off-topic queries, politely say: "I'm focused on Utkarsh's portfolio—ask about his education, projects, or experience!"
 
 ${context}
 
-Your role is to answer questions about Utkarsh's background, experience, projects, skills, and provide helpful information to visitors. Be professional, concise, and helpful. Always base responses on the provided data.`;
+FULL RESUME CONTENT (USE THIS FOR ALL DETAILS):
+${fullResumeContent}
+
+Be professional, concise (under 150 words), and helpful. Structure answers with bullets if listing (e.g., projects).`;
       }
     }
 
@@ -201,14 +208,15 @@ Your role is to answer questions about Utkarsh's background, experience, project
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'llama-3.1-70b-versatile',  // Upgraded for better context handling
         messages: [
           { role: 'system', content: systemMessage },
           ...(Array.isArray(history) ? history : []),
           { role: 'user', content: message }
         ],
-        temperature: 0.1,  // Lowered for more deterministic, less hallucinated responses
-        max_tokens: 300    // Limit to keep responses concise
+        temperature: 0.0,  // Zero for ultra-factual responses
+        max_tokens: 200,   // Keep concise
+        top_p: 0.9         // Focus on relevant tokens
       })
     });
 
