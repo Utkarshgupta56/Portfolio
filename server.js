@@ -131,7 +131,8 @@ app.post('/api/chat', async (req, res) => {
 
   const apiKey = process.env.MISTRAL_API_KEY;  // Changed to Mistral key
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server is missing MISTRAL_API_KEY' });
+    console.error('MISTRAL_API_KEY is not set! Make sure to set it in your .env file or environment variables.');
+    return res.status(500).json({ error: 'Server is missing MISTRAL_API_KEY. Please set it in your environment variables.' });
   }
 
   // Debug logging (remove in production after testing)
@@ -219,16 +220,25 @@ ${fullResumeContent}`;
         ],
         temperature: 0.0,  // Factual only—no creativity or "sorry" evasions
         max_tokens: 150,   // Super concise
-        top_p: 0.8         // Tight focus on provided data
+        top_p: 1.0         // Must be 1 when temperature is 0 (greedy sampling)
       })
     });
 
     const data = await mistralResponse.json();
     if (!mistralResponse.ok) {
-      return res.status(mistralResponse.status).json({ error: data.error || 'Mistral API error' });
+      console.error('Mistral API error:', mistralResponse.status, data);
+      return res.status(mistralResponse.status).json({ 
+        error: data.error?.message || data.error || 'Mistral API error',
+        details: data
+      });
     }
 
-    const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong—try rephrasing.';
+    const reply = data.choices?.[0]?.message?.content;
+    if (!reply) {
+      console.error('No reply in Mistral response:', JSON.stringify(data, null, 2));
+      return res.status(500).json({ error: 'No reply generated from Mistral API', details: data });
+    }
+    
     console.log('Generated reply:', reply);  // Log for debugging
     return res.json({ reply });
   } catch (err) {

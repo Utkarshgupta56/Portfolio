@@ -194,7 +194,7 @@ CPI: 9.17
 Work Experience
 AI Intern
 Jun 2025 - Present
-Dvara-E-Registery
+Dvara-E-Registry
 
 • Developed and implemented a price imputation pipeline for commodities, utilizing weighted correlation
 imputation with a 365-day rolling window to accurately fill missing price data by leveraging correlated market
@@ -354,9 +354,27 @@ Board (2021-22)
                 })
             });
 
+            // Check if response is ok
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}: ${response.statusText}` }));
+                console.error("Server error:", errorData);
+                addMessage("Chatbot", errorData.error || `Error: Server returned ${response.status}`);
+                return;
+            }
+
             const data = await response.json();
-            const botMessage = data.reply || "Sorry, I couldn't understand that.";
-            addMessage("Chatbot", botMessage);
+            console.log("Server response:", data); // Debug log
+            
+            // Check if we got a reply or an error
+            if (data.error) {
+                console.error("API error:", data.error);
+                addMessage("Chatbot", `Error: ${data.error}`);
+            } else if (data.reply) {
+                addMessage("Chatbot", data.reply);
+            } else {
+                console.error("Unexpected response format:", data);
+                addMessage("Chatbot", "Sorry, I couldn't understand that. (No reply in response)");
+            }
         } catch (error) {
             console.error("Chat error:", error);
             addMessage("Chatbot", "Error: Unable to reach the chat service. Try again later.");
