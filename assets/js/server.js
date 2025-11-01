@@ -144,6 +144,109 @@ document.addEventListener("DOMContentLoaded", function () {
         return context;
     }
 
+    // Full resume content as static string (extracted from Resume.pdf)
+    const fullResumeContent = `
+Utkarsh Gupta
++91 9529133103 itsutkarsh1207@gmail.com
+LinkedIn
+GitHub
+Education
+Indian Institute of Technology Dharwad
+2022 – Current
+B.Tech, Computer Science And Engineering
+CPI: 9.17
+Work Experience
+AI Intern
+Jun 2025 - Present
+Dvara-E-Registery
+
+• Developed and implemented a price imputation pipeline for commodities, utilizing weighted correlation
+imputation with a 365-day rolling window to accurately fill missing price data by leveraging correlated market
+trends.
+
+• Analyzed and visualized commodity price data using statistical techniques like Lasso regression and Plotly, achieving
+reliable imputation results (e.g., R² 0.8) for enhanced market forecasting and decision-making.
+
+Summer Research and Development Internship
+May 2024 - Jul 2024
+FutureGNetworks Lab, IIT Dharwad
+
+• Led experimental research for resource profiling in virtualized Radio Access Networks (vRAN), employing scalable
+multi-core server infrastructure and a Kubernetes-based 5G testbed under the guidance of Prof. Koteswarao Kondepu.
+
+• Integrated open-source power monitoring and system profiling tools (KEPLER, Prometheus, Grafana) into
+containerized 5G RAN deployments to enable real-time telemetry of CPU, cache, memory bandwidth, and
+energy metrics.
+
+• Built automated workload generation and dynamic resource allocation workflows using iperf3, evaluating
+throughput, CPU utilization, LLC cache allocation, and memory bandwidth across deployment models
+(Monolithic RAN, Disaggregated RAN, C/U-plane separation).
+
+Publications
+Research Paper - IEEE ANTS 2024
+Dec 14, 2024 – Dec 18, 2024
+IEEE ComSoc | 5G vRAN, Energy Profiling, Kubernetes, Prometheus, Grafana
+IIT Guwahati, India
+
+• Analyzed Radio Access Network (RAN) components of cellular networks focusing on CPU utilization, LLC
+(Last-Level Cache) ways allocation, and memory bandwidth efficiency.
+
+• Co-authored and published research paper in the IEEE ANTS Conference 2024.
+
+Projects
+
+AI Playwright | Scikit-learn, NLTK, Pandas, NumPy, Pytorch
+
+• Developed a custom subword tokenizer inspired by BPE and WordPiece to efficiently handle rare words and reduce
+vocabulary size for NLP tasks.
+
+• Built a lightweight GPT-style language model from scratch using PyTorch, including custom attention,
+feedforward layers, and training loop on tokenized text data.
+
+• Trained and evaluated the transformer model, achieving low perplexity on the test set, with checkpointing and
+inference capabilities for custom sentence generation.
+
+College Tech Fest Website | ReactJS, ExpressJS, HTML5, JavaScript, React Three Fiber, Tailwind
+
+• Contributed to a React-based 3D web experience using React Three Fiber and Three.js for an interactive
+and immersive event website.
+
+• Utilized Tailwind CSS and Vite to build responsive, high-performance UI components with efficient styling and fast
+development workflows.
+
+• Integrated 3D assets and animations into the frontend enhancing visual appeal and user engagement.
+
+DDoS attack Detection and Mitigation in SDN | Python, Mininet, Ryu Controller, scikit-learn, OpenFlow, hping3
+
+• Developed a real-time ML-based intrusion detection system for SDN environments, achieving 98.6% accuracy using
+Random Forest. .
+
+• Constructed a dynamic DDoS mitigation framework with the Ryu controller and OpenFlow, enabling
+automatic detection and blocking within 5 seconds while maintaining > 80% legitimate traffic throughput
+post-mitigation.
+
+• Automated traffic simulation and aggregation in a 6-switch, 18-host Mininet topology, validating robustness
+across TCP-SYN, ICMP, and UDP attacks with low false positives and high availability.
+
+Certifications
+HackerRank — SQL Skill Test Certification: Basic, Intermediate, Advanced
+
+Technical Skills
+
+Languages: C/C++, Python, JavaScript, Bash
+Frameworks / Testing: NodeJS, ExpressJS, ReactJS,MySQL, MongoDB
+DevOps: Kubernetes, Docker, Prometheus, Grafana
+Key Courses: Data Structures and Algorithms, Design and Analysis of Algorithms, Deep Learning, Operating
+Systems,DBMS
+
+Achievements
+General Secretary Academic Affairs (2025-26) and Junior General Secretary Academic Affairs (2022-24)
+Assistant Student Mentor Coordinator, Student Mentorship Program(SMP), IIT Dharwad
+Public Relations Coordinator, Carrer Development Cell (CDC), IIT Dharwad
+Class XII Achievement: INSPIRE Scholarship awardee (Top 1%) for securing top percentile in Maharashtra
+Board (2021-22)
+    `;
+
     // Function to send a message with website context
     async function sendMessage() {
         const userMessage = chatInput.value.trim();
@@ -194,6 +297,9 @@ ${websiteContext.skills.join(', ')}
 
 CONTACT INFORMATION:
 ${Object.entries(websiteContext.contact).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n')}
+
+FULL RESUME CONTENT:
+${fullResumeContent}
 
 Your role is to answer questions about Utkarsh's background, experience, projects, skills, and provide helpful information to visitors. Be professional, concise, and helpful.`;
 
