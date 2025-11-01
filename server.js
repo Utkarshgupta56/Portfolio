@@ -1,5 +1,6 @@
-// Simple proxy server for OpenAI Chat Completions
-// Usage: OPENAI_API_KEY=your_key node server.js
+// Simple proxy server for Mistral AI Chat Completions
+// Usage: MISTRAL_API_KEY=your_key node server.js (for local testing)
+// On Netlify, use the netlify/functions/api-chat.js for production
 
 const express = require('express');
 const cors = require('cors');
@@ -128,9 +129,9 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: 'Missing message' });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.MISTRAL_API_KEY;  // Changed to Mistral key
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server is missing OPENAI_API_KEY' });
+    return res.status(500).json({ error: 'Server is missing MISTRAL_API_KEY' });
   }
 
   // Debug logging (remove in production after testing)
@@ -202,15 +203,15 @@ ${fullResumeContent}`;
       fullContext = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
     }
 
-    // Now send the full context as system prompt, followed by user message
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Now send the full context as system prompt, followed by user message (Mistral API)
+    const mistralResponse = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',  // Efficient and capable; upgrade to 'gpt-4o' if needed for complex queries
+        model: 'mistral-small-latest',  // Fast & cheap; upgrade to 'mistral-large-latest' for more complex queries
         messages: [
           { role: 'system', content: fullContext },  // Full context ALWAYS first
           ...(Array.isArray(history) ? history : []),
@@ -222,9 +223,9 @@ ${fullResumeContent}`;
       })
     });
 
-    const data = await openaiResponse.json();
-    if (!openaiResponse.ok) {
-      return res.status(openaiResponse.status).json({ error: data.error || 'OpenAI API error' });
+    const data = await mistralResponse.json();
+    if (!mistralResponse.ok) {
+      return res.status(mistralResponse.status).json({ error: data.error || 'Mistral API error' });
     }
 
     const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong—try rephrasing.';
