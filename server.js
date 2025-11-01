@@ -1,5 +1,5 @@
-// Simple proxy server for Groq Chat Completions
-// Usage: GROQ_API_KEY=your_key node server.js
+// Simple proxy server for OpenAI Chat Completions
+// Usage: OPENAI_API_KEY=your_key node server.js
 
 const express = require('express');
 const cors = require('cors');
@@ -35,7 +35,7 @@ CPI: 9.17
 Work Experience
 AI Intern
 Jun 2025 - Present
-Dvara-E-Registery
+Dvara-E-Registry
 
 • Developed and implemented a price imputation pipeline for commodities, utilizing weighted correlation
 imputation with a 365-day rolling window to accurately fill missing price data by leveraging correlated market
@@ -96,7 +96,7 @@ development workflows.
 DDoS attack Detection and Mitigation in SDN | Python, Mininet, Ryu Controller, scikit-learn, OpenFlow, hping3
 
 • Developed a real-time ML-based intrusion detection system for SDN environments, achieving 98.6% accuracy using
-Random Forest. .
+Random Forest.
 
 • Constructed a dynamic DDoS mitigation framework with the Ryu controller and OpenFlow, enabling
 automatic detection and blocking within 5 seconds while maintaining > 80% legitimate traffic throughput
@@ -130,104 +130,102 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: 'Missing message' });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server is missing GROQ_API_KEY' });
+    return res.status(500).json({ error: 'Server is missing OPENAI_API_KEY' });
   }
 
-  // Debug logging (remove in production)
-  console.log('Received websiteData:', !!websiteData ? 'Yes' : 'No');
-  console.log('Received context length:', context ? context.length : 0);
+  // Debug logging (remove in production after testing)
+  console.log('Query:', message);
+  console.log('websiteData received:', !!websiteData);
+  if (websiteData) console.log('websiteData keys:', Object.keys(websiteData));
+  console.log('context length:', context ? context.length : 0);
 
   try {
     let systemMessage = 'You are a concise assistant for Utkarsh\'s portfolio site. Be brief and helpful.';
     
     if (websiteData || context) {
-      // Prioritize websiteData object if available, fallback to context string
-      if (websiteData) {
-        // Build comprehensive system message from websiteData
-        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. CRITICALLY: ALWAYS base EVERY response on the EXACT information below. Do not say "I don't have information" or evade—use the data provided. If unclear, reference the FULL RESUME CONTENT section. For off-topic queries, politely say: "I'm focused on Utkarsh's portfolio—ask about his education, projects, or experience!"
+      // Force context usage: Validate and build prompt
+      const hasValidData = websiteData && (websiteData.personalInfo || websiteData.projects || websiteData.workExperience);
+      if (hasValidData) {
+        systemMessage = `You are Utkarsh Gupta's portfolio AI assistant. STEP 1: Scan the EXACT data below (including FULL RESUME CONTENT) for facts. STEP 2: Answer ONLY using those facts—NEVER say "I don't know" or invent details. If no match, quote the closest section. STEP 3: Keep under 100 words; use bullets for lists. STEP 4: For off-topic, redirect: "Let's talk Utkarsh's portfolio—education, projects, or experience?"
+
+EXAMPLE:
+User: "What does he study?" → "B.Tech in Computer Science and Engineering at IIT Dharwad (CPI: 9.17)."
+User: "Projects?" → Bullet list from PROJECTS section.
+User: "Random fact?" → "Sticking to portfolio: Ask about his AI Intern role!"
 
 PERSONAL INFORMATION:
-Name: ${websiteData.personalInfo.name || 'Utkarsh Gupta'}
-Role: ${websiteData.personalInfo.title || 'Final Year CSE Undergraduate at IIT Dharwad'}
+Name: ${websiteData.personalInfo?.name || 'Utkarsh Gupta'}
+Role: ${websiteData.personalInfo?.title || 'Final Year CSE Undergraduate at IIT Dharwad'}
 
-ABOUT:
-${websiteData.about || ''}
+ABOUT: ${websiteData.about || ''}
 
-KEY HIGHLIGHTS:
-${websiteData.personalInfo.highlights ? websiteData.personalInfo.highlights.join('\n') : ''}
+KEY HIGHLIGHTS: ${websiteData.personalInfo?.highlights?.join('\n') || ''}
 
 WORK EXPERIENCE:
-${(websiteData.workExperience || []).map(exp => `
-${exp.title} (${exp.date})
-${exp.description}
-Key Responsibilities:
-${exp.responsibilities.map(r => '- ' + r).join('\n')}`).join('\n\n') || ''}
+${(websiteData.workExperience || []).map(exp => `- ${exp.title} (${exp.date}): ${exp.description}\n  Responsibilities: ${exp.responsibilities.join('; ')}`).join('\n') || 'See FULL RESUME CONTENT'}
 
 PROJECTS:
-${(websiteData.projects || []).map(proj => `
-${proj.name}
-${proj.techStack}
-Project Details:
-${proj.details.map(d => '- ' + d).join('\n')}`).join('\n\n') || ''}
+${(websiteData.projects || []).map(proj => `- ${proj.name}: ${proj.techStack}\n  Details: ${proj.details.join('; ')}`).join('\n') || 'See FULL RESUME CONTENT'}
 
 PUBLICATIONS:
-${(websiteData.publications || []).map(pub => `
-${pub.title}
-${pub.conference}
-${pub.details.map(d => '- ' + d).join('\n')}`).join('\n\n') || ''}
+${(websiteData.publications || []).map(pub => `- ${pub.title} (${pub.conference}): ${pub.details.join('; ')}`).join('\n') || 'See FULL RESUME CONTENT'}
 
-SKILLS:
-${(websiteData.skills || []).join(', ')}
+SKILLS: ${(websiteData.skills || []).join(', ') || 'See FULL RESUME CONTENT'}
 
-CONTACT INFORMATION:
-${Object.entries(websiteData.contact || {}).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n')}
+CONTACT: ${Object.entries(websiteData.contact || {}).map(([k, v]) => `${k}: ${v}`).join('\n') || 'See FULL RESUME CONTENT'}
 
-FULL RESUME CONTENT (USE THIS FOR ALL DETAILS):
-${fullResumeContent}
-
-Be professional, concise (under 150 words), and helpful. Structure answers with bullets if listing (e.g., projects).`;
+FULL RESUME CONTENT (MANDATORY REFERENCE FOR ALL QUERIES):
+${fullResumeContent}`;
       } else if (context) {
-        // Fallback: Use the context string directly as system prompt (if websiteData missing)
-        systemMessage = `You are an AI assistant for Utkarsh Gupta's portfolio website. CRITICALLY: ALWAYS base EVERY response on the EXACT information below. Do not say "I don't have information" or evade—use the data provided. If unclear, reference the FULL RESUME CONTENT section. For off-topic queries, politely say: "I'm focused on Utkarsh's portfolio—ask about his education, projects, or experience!"
+        // Fallback to context string
+        systemMessage = `You are Utkarsh Gupta's portfolio AI assistant. STEP 1: Scan the EXACT data below (including FULL RESUME CONTENT) for facts. STEP 2: Answer ONLY using those facts—NEVER say "I don't know" or invent details. If no match, quote the closest section. STEP 3: Keep under 100 words; use bullets for lists. STEP 4: For off-topic, redirect: "Let's talk Utkarsh's portfolio—education, projects, or experience?"
+
+EXAMPLE:
+User: "What does he study?" → "B.Tech in Computer Science and Engineering at IIT Dharwad (CPI: 9.17)."
+User: "Projects?" → Bullet list from PROJECTS section.
 
 ${context}
 
-FULL RESUME CONTENT (USE THIS FOR ALL DETAILS):
-${fullResumeContent}
-
-Be professional, concise (under 150 words), and helpful. Structure answers with bullets if listing (e.g., projects).`;
+FULL RESUME CONTENT (MANDATORY REFERENCE FOR ALL QUERIES):
+${fullResumeContent}`;
+      } else {
+        console.warn('No valid context—using fallback prompt');
       }
+    } else {
+      console.error('No context provided—responses will be generic');
     }
 
-    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',  // Upgraded for better context handling
+        model: 'gpt-4o-mini',  // Efficient and capable; use 'gpt-4o' for even better quality
         messages: [
           { role: 'system', content: systemMessage },
           ...(Array.isArray(history) ? history : []),
           { role: 'user', content: message }
         ],
-        temperature: 0.0,  // Zero for ultra-factual responses
-        max_tokens: 200,   // Keep concise
-        top_p: 0.9         // Focus on relevant tokens
+        temperature: 0.0,  // Factual only—no creativity
+        max_tokens: 150,   // Super concise
+        top_p: 0.8         // Tight focus
       })
     });
 
-    const data = await groqResponse.json();
-    if (!groqResponse.ok) {
-      return res.status(groqResponse.status).json({ error: data.error || 'Groq API error' });
+    const data = await openaiResponse.json();
+    if (!openaiResponse.ok) {
+      return res.status(openaiResponse.status).json({ error: data.error || 'OpenAI API error' });
     }
 
-    const reply = data.choices?.[0]?.message?.content || '';
+    const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
+    console.log('Generated reply:', reply);  // Log for debugging
     return res.json({ reply });
   } catch (err) {
+    console.error('Server error:', err);
     return res.status(500).json({ error: 'Upstream error', details: String(err) });
   }
 });
